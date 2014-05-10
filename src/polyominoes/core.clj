@@ -54,7 +54,7 @@
   [polyomino]
   (->> polyomino
        retrieveRotationsAndMirror
-       (map (comp vec translateToOrigin sort))
+       (pmap (comp vec translateToOrigin sort))
        (apply sorted-set)
        first))
 
