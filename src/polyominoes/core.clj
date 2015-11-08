@@ -132,5 +132,4 @@
   (-> args
       first
       Integer/parseInt
-      nbOfpolyominoes
-      println))
+      nbOfPolyominos))
