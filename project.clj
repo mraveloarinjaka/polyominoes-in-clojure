@@ -3,7 +3,8 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [tesser.core "1.0.2"]]
   :main ^:skip-aot polyominoes.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
