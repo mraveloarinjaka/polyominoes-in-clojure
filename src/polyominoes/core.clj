@@ -7,15 +7,15 @@
 (defn findOrigin
   [polyomino]
   (reduce
-   (fn [[resX resY] [x y]] (vector (min resX x) (min resY y)))
-   polyomino))
+    (fn [[resX resY] [x y]] (vector (min resX x) (min resY y)))
+    polyomino))
 
 (defn translateToOrigin
   [polyomino]
   (let [[originX originY] (findOrigin polyomino)]
     (mapv
-     (fn [[x y]] (vector (- x originX) (- y originY)))
-     polyomino)))
+      (fn [[x y]] (vector (- x originX) (- y originY)))
+      polyomino)))
 
 (defn rotateOnePoint90
   [[x y]]
@@ -36,8 +36,8 @@
 (defn mirror
   [polyomino]
   (mapv
-   (fn [[x y]] (vector (* x -1) y))
-   polyomino))
+    (fn [[x y]] (vector (* x -1) y))
+    polyomino))
 
 (defn retrieveRotationsAndMirror
   [polyomino]
@@ -114,22 +114,33 @@
           (into #{})))})
 
 (defn generate
-  ([]
+  ([generator]
    (let [initialResult [[[0 0]]]]
-     (cons initialResult (generate initialResult))))
-  ([polyominoes]
-   (let [generated ((:tesser GENERATORS) polyominoes)]
-     (lazy-seq (cons generated (generate generated))))))
+     (cons initialResult (generate generator initialResult))))
+  ([generator polyominoes]
+   (let [generated (generator polyominoes)]
+     (lazy-seq (cons generated (generate generator generated))))))
 
-(defn nbOfpolyominoes
-  [N]
-  {:pre [(number? N) (> N 0)]}
-  (count (nth (generate) (dec N))))
+(defn nbOfPolyominoes
+  [{:keys [cells generator]
+    :or   {generator :tesser}}]
+  {:pre [(number? cells) (> cells 0)]}
+  (count (nth (generate (get GENERATORS generator (:tesser GENERATORS))) (dec cells))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (-> args
-      first
-      Integer/parseInt
-      nbOfPolyominos))
+  (let [N (-> args
+              first
+              Integer/parseInt)]
+    (nbOfPolyominoes {:cells N})))
+
+(comment
+
+  (nbOfPolyominoes {:cells 5})
+  (nbOfPolyominoes {:cells 5 :generator :transducer})
+  (nbOfPolyominoes {:cells 5 :generator :reducer})
+  (nbOfPolyominoes {:cells 12})
+  (nbOfPolyominoes {:cells 12 :generator :reducer})
+
+  )
