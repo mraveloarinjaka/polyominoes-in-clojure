@@ -6,27 +6,27 @@
 (defn findOrigin
   [polyomino]
   (reduce
-    (fn [[resX resY] [x y]] (vector (min resX x) (min resY y)))
+    (fn [[resX resY] [x y]] [(min resX x) (min resY y)])
     polyomino))
 
 (defn translateToOrigin
   [polyomino]
   (let [[originX originY] (findOrigin polyomino)]
     (mapv
-      (fn [[x y]] (vector (- x originX) (- y originY)))
+      (fn [[x y]] [(- x originX) (- y originY)])
       polyomino)))
 
 (defn rotateOnePoint90
   [[x y]]
-  (vector (* y -1) x))
+  [(* y -1) x])
 
 (defn rotateOnePoint180
   [[x y]]
-  (vector (* x -1) (* y -1)))
+  [(* x -1) (* y -1)])
 
 (defn rotateOnePoint270
   [[x y]]
-  (vector y (* x -1)))
+  [y (* x -1)])
 
 (defn rotate
   ([rotation polyomino]
@@ -38,7 +38,7 @@
 (defn mirror
   [polyomino]
   (mapv
-    (fn [[x y]] (vector (* x -1) y))
+    (fn [[x y]] [(* x -1) y])
     polyomino))
 
 (defn retrieveRotationsAndMirror
