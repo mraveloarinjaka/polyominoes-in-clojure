@@ -5,7 +5,7 @@
                       :main-opts  ["-m" "antq.core"]}
            :test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
-                               {:git/sha "a522ab2851a2aa5bf9c22a942b45287a3a019310"}}
+                               {:git/sha "7284cda41fb9edc0f3bc6b6185cfb7138fc8a023"}}
                   :main-opts ["-m" "cognitect.test-runner"]
                   :exec-fn cognitect.test-runner.api/test}
            :nREPL {:extra-deps {cider/cider-nrepl             {:mvn/version "0.28.6"}
