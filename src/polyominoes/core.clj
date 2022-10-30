@@ -87,29 +87,29 @@
 
 (defonce GENERATORS
   {:tesser
-   (fn [polyominos]
+   (fn [polyominoes]
      (->> (t/map #(into [] (fromOnePolyomino %)))
           (t/into [])
-          (t/tesser (t/chunk CHUNK polyominos))
+          (t/tesser (t/chunk CHUNK polyominoes))
           (apply concat)
           (into #{})))
 
    :pmap
-   (fn [polyominos]
-     (->> polyominos
+   (fn [polyominoes]
+     (->> polyominoes
           (pmap #(into [] (fromOnePolyomino %)))
           (apply concat)
           (into #{})))
 
    :transducer
-   (fn [polyominos]
-     (->> polyominos
+   (fn [polyominoes]
+     (->> polyominoes
           (r/mapcat #(into [] (fromOnePolyominoTransducer %) %))
           (into #{})))
 
    :reducer
-   (fn [polyominos]
-     (->> polyominos
+   (fn [polyominoes]
+     (->> polyominoes
           (r/mapcat #(into [] (fromOnePolyomino %)))
           (into #{})))})
 
@@ -117,11 +117,11 @@
   ([]
    (let [initialResult [[[0 0]]]]
      (cons initialResult (generate initialResult))))
-  ([polyominos]
-   (let [generated ((:tesser GENERATORS) polyominos)]
+  ([polyominoes]
+   (let [generated ((:tesser GENERATORS) polyominoes)]
      (lazy-seq (cons generated (generate generated))))))
 
-(defn nbOfPolyominos
+(defn nbOfpolyominoes
   [N]
   {:pre [(number? N) (> N 0)]}
   (count (nth (generate) (dec N))))
@@ -132,5 +132,5 @@
   (-> args
       first
       Integer/parseInt
-      nbOfPolyominos
+      nbOfpolyominoes
       println))
