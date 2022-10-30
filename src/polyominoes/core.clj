@@ -66,7 +66,16 @@
    [x (dec y)]
    [x (inc y)]])
 
-(defn generateFromOnePolyomino
+;transducer
+;(defn fromOnePolyomino
+  ;[polyomino]
+  ;(comp
+   ;(mapcat neighbors)
+   ;(remove (set polyomino))
+   ;(map (partial conj polyomino))
+   ;(map retrieveCanonicalForm)))
+
+(defn fromOnePolyomino
   [polyomino]
   (->> polyomino
        (r/mapcat neighbors)
@@ -79,10 +88,10 @@
    (let [initialResult [[[0 0]]]]
      (cons initialResult (generate initialResult))))
   ([polyominos]
-   (let [generated
-         (->> polyominos
-              (r/mapcat generateFromOnePolyomino)
-              (into #{}))]
+   (let [generated (->> polyominos
+                        (pmap #(into [] (fromOnePolyomino %)))
+                        (apply concat)
+                        (into #{}))]
      (lazy-seq (cons generated (generate generated))))))
 
 (defn nbOfPolyominos
