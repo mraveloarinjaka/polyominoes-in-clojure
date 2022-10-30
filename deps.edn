@@ -3,6 +3,11 @@
            tesser.core/tesser.core {:mvn/version "1.0.5"}}
  :aliases {:outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
                       :main-opts  ["-m" "antq.core"]}
+           :test {:extra-paths ["test"]
+                  :extra-deps {io.github.cognitect-labs/test-runner
+                               {:git/sha "a85b3b02765fb68684ab9ee4a8598eacf7e471d2"}}
+                  :main-opts ["-m" "cognitect.test-runner"]
+                  :exec-fn cognitect.test-runner.api/test}
            :nREPL {:extra-deps {cider/cider-nrepl             {:mvn/version "0.28.5"}
                                 refactor-nrepl/refactor-nrepl {:mvn/version "3.5.5"}}
                    :main-opts  ["-m" "nrepl.cmdline"
