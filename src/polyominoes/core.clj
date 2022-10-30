@@ -40,15 +40,15 @@
 (defn retrieveRotationsAndMirror
   [polyomino]
   (let [mirrored (mirror polyomino)]
-  (list
-    polyomino
-    (rotate rotateOnePoint90 polyomino)
-    (rotate rotateOnePoint180 polyomino)
-    (rotate rotateOnePoint270 polyomino)
-    mirrored
-    (rotate rotateOnePoint90 mirrored)
-    (rotate rotateOnePoint180 mirrored)
-    (rotate rotateOnePoint270 mirrored))))
+    (list
+      polyomino
+      (rotate rotateOnePoint90 polyomino)
+      (rotate rotateOnePoint180 polyomino)
+      (rotate rotateOnePoint270 polyomino)
+      mirrored
+      (rotate rotateOnePoint90 mirrored)
+      (rotate rotateOnePoint180 mirrored)
+      (rotate rotateOnePoint270 mirrored))))
 
 (defn retrieveCanonicalForm
   [polyomino]
@@ -60,36 +60,36 @@
 
 (defn neighbors
   [[x y]]
-  (list (vector (- x 1) y)
-        (vector (+ x 1) y)
-        (vector x (- y 1))
-        (vector x (+ y 1))))
+  (vector (vector (- x 1) y)
+          (vector (+ x 1) y)
+          (vector x (- y 1))
+          (vector x (+ y 1))))
 
 (defn adjacents
   [polyomino]
   (reduce (fn [result point]
-            (reduce conj 
-                    result 
-                    (remove (set polyomino) (neighbors point))))
+            (reduce 
+              conj 
+              result 
+              (remove (set polyomino) (neighbors point))))
           #{}
           polyomino))
 
 (defn generateFromOnePolyomino
   [polyomino]
   (->> polyomino
-      adjacents
-      (map (comp retrieveCanonicalForm #(conj polyomino %)))))
+       adjacents
+       (map (comp retrieveCanonicalForm vec #(conj polyomino %)))))
 
 (defn generate
   ([]
    (let [initialResult [[[0 0]]]]
-   (concat initialResult (generate initialResult))))
+     (cons initialResult (generate initialResult))))
   ([polyominos]
    (let [generated 
-         (->> polyominos
-              (mapcat generateFromOnePolyomino)
-              ;(pmap generateFromOnePolyomino)
-              ;concat
+         (->> polyominos 
+              (pmap generateFromOnePolyomino)
+              (apply concat)
               set
               sequence)]
      (lazy-seq (cons generated (generate generated))))))
