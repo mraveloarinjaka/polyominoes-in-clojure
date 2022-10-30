@@ -1,4 +1,5 @@
 (ns polyominoes.core
+  (:require [clojure.set])
   (:gen-class))
 
 (defn findOrigin
@@ -80,7 +81,8 @@
   (->> polyomino
       adjacents
       (map #(conj polyomino %))
-      (map retrieveCanonicalForm)
+      ;(map retrieveCanonicalForm)
+      (pmap retrieveCanonicalForm)
       set
       sequence))
 
@@ -91,7 +93,9 @@
   ([polyominos]
    (let [generated 
          (->> polyominos
-              (mapcat generateFromOnePolyomino)
+              ;(mapcat generateFromOnePolyomino)
+              (pmap generateFromOnePolyomino)
+              concat
               set
               sequence)]
      (lazy-seq (cons generated (generate generated))))))
@@ -104,4 +108,8 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (-> args
+      first
+      Integer/parseInt
+      nbOfPolyominos
+      println))
