@@ -15,15 +15,15 @@
       (fn [[x y]] (vector (- x originX) (- y originY)))
       polyomino)))
 
-(defn rotateOnePoint90
+(defn rotateOnePoint90 
   [[x y]]
   (vector (* y -1) x))
 
-(defn rotateOnePoint180
+(defn rotateOnePoint180 
   [[x y]]
   (vector (* x -1) (* y -1)))
 
-(defn rotateOnePoint270
+(defn rotateOnePoint270 
   [[x y]]
   (vector y (* x -1)))
 
@@ -67,24 +67,18 @@
 
 (defn adjacents
   [polyomino]
-  (let 
-    [potentialAdjacents
-     (reduce
-       (fn [result point]
-         (reduce conj result (neighbors point)))
-       #{}
-       polyomino)]
-    (clojure.set/difference potentialAdjacents (set polyomino))))
+  (reduce (fn [result point]
+            (reduce conj 
+                    result 
+                    (remove (set polyomino) (neighbors point))))
+          #{}
+          polyomino))
 
 (defn generateFromOnePolyomino
   [polyomino]
   (->> polyomino
       adjacents
-      (map #(conj polyomino %))
-      ;(map retrieveCanonicalForm)
-      (pmap retrieveCanonicalForm)
-      set
-      sequence))
+      (map (comp retrieveCanonicalForm #(conj polyomino %)))))
 
 (defn generate
   ([]
@@ -93,16 +87,16 @@
   ([polyominos]
    (let [generated 
          (->> polyominos
-              ;(mapcat generateFromOnePolyomino)
-              (pmap generateFromOnePolyomino)
-              concat
+              (mapcat generateFromOnePolyomino)
+              ;(pmap generateFromOnePolyomino)
+              ;concat
               set
               sequence)]
      (lazy-seq (cons generated (generate generated))))))
 
 (defn nbOfPolyominos
   [N]
-  {:pre [(instance? Number N) (> N 0)]}
+  {:pre [(number? N) (> N 0)]}
   (count (nth (generate) (dec N))))
 
 (defn -main
