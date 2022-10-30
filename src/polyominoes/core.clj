@@ -130,17 +130,9 @@
 
 (defn nbOfPolyominoes
   [{:keys [cells generator]
-    :or   {generator :tesser}}]
+    :or {generator :tesser}}]
   {:pre [(number? cells) (> cells 0)]}
   (count (nth (generate (get GENERATORS generator (:tesser GENERATORS))) (dec cells))))
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (let [N (-> args
-              first
-              Integer/parseInt)]
-    (nbOfPolyominoes {:cells N})))
 
 (comment
 
