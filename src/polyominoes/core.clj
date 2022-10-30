@@ -1,8 +1,7 @@
 (ns polyominoes.core
   (:require [clojure.set]
             [clojure.core.reducers :as r]
-            [tesser.core :as t])
-  (:gen-class))
+            [tesser.core :as t]))
 
 (defn findOrigin
   [polyomino]
@@ -30,8 +29,11 @@
   (vector y (* x -1)))
 
 (defn rotate
-  [rotator polyomino]
-  (mapv rotator polyomino))
+  ([rotation polyomino]
+   (mapv rotation polyomino))
+  ([rotation]
+   (fn [polyomino]
+     (rotate rotation polyomino))))
 
 (defn mirror
   [polyomino]
@@ -42,14 +44,14 @@
 (defn retrieveRotationsAndMirror
   [polyomino]
   ((juxt
-    identity
-    (partial rotate rotateOnePoint90)
-    (partial rotate rotateOnePoint180)
-    (partial rotate rotateOnePoint270)
-    mirror
-    (comp (partial rotate rotateOnePoint90) mirror)
-    (comp (partial rotate rotateOnePoint180) mirror)
-    (comp (partial rotate rotateOnePoint270) mirror))
+     identity
+     (rotate rotateOnePoint90)
+     (rotate rotateOnePoint180)
+     (rotate rotateOnePoint270)
+     mirror
+     (comp (rotate rotateOnePoint90) mirror)
+     (comp (rotate rotateOnePoint180) mirror)
+     (comp (rotate rotateOnePoint270) mirror))
    polyomino))
 
 (defn retrieveCanonicalForm
@@ -59,6 +61,8 @@
        (r/map (comp translateToOrigin sort))
        (into (sorted-set))
        first))
+
+#_(retrieveCanonicalForm [[0 1] [1 1] [0 0] [1 2]])
 
 (defn neighbors
   [[x y]]
@@ -75,17 +79,20 @@
        (r/map (partial conj polyomino))
        (r/map retrieveCanonicalForm)))
 
+#_(let [res (fromOnePolyomino [[0 1] [1 1] [0 0] [1 2]])]
+    (into [] res))
+
 (defn fromOnePolyominoTransducer
   [polyomino]
   (comp
-   (mapcat neighbors)
-   (remove (set polyomino))
-   (map (partial conj polyomino))
-   (map retrieveCanonicalForm)))
+    (mapcat neighbors)
+    (remove (set polyomino))
+    (map (partial conj polyomino))
+    (map retrieveCanonicalForm)))
 
 (defonce CHUNK 100)
 
-(defonce GENERATORS
+(def GENERATORS
   {:tesser
    (fn [polyominoes]
      (->> (t/map #(into [] (fromOnePolyomino %)))
@@ -104,13 +111,13 @@
    :transducer
    (fn [polyominoes]
      (->> polyominoes
-          (r/mapcat #(into [] (fromOnePolyominoTransducer %) %))
+          (r/mapcat #(eduction (fromOnePolyominoTransducer %) %))
           (into #{})))
 
    :reducer
    (fn [polyominoes]
      (->> polyominoes
-          (r/mapcat #(into [] (fromOnePolyomino %)))
+          (r/mapcat fromOnePolyomino)
           (into #{})))})
 
 (defn generate
