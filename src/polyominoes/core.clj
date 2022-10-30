@@ -1,6 +1,7 @@
 (ns polyominoes.core
   (:require [clojure.set]
-            [clojure.core.reducers :as r])
+            [clojure.core.reducers :as r]
+            [tesser.core :as t])
   (:gen-class))
 
 (defn findOrigin
@@ -66,15 +67,6 @@
    [x (dec y)]
    [x (inc y)]])
 
-;transducer
-;(defn fromOnePolyomino
-  ;[polyomino]
-  ;(comp
-   ;(mapcat neighbors)
-   ;(remove (set polyomino))
-   ;(map (partial conj polyomino))
-   ;(map retrieveCanonicalForm)))
-
 (defn fromOnePolyomino
   [polyomino]
   (->> polyomino
@@ -83,15 +75,50 @@
        (r/map (partial conj polyomino))
        (r/map retrieveCanonicalForm)))
 
+(defn fromOnePolyominoTransducer
+  [polyomino]
+  (comp
+   (mapcat neighbors)
+   (remove (set polyomino))
+   (map (partial conj polyomino))
+   (map retrieveCanonicalForm)))
+
+(defonce CHUNK 100)
+
+(defonce GENERATORS
+  {:tesser
+   (fn [polyominos]
+     (->> (t/map #(into [] (fromOnePolyomino %)))
+          (t/into [])
+          (t/tesser (t/chunk CHUNK polyominos))
+          (apply concat)
+          (into #{})))
+
+   :pmap
+   (fn [polyominos]
+     (->> polyominos
+          (pmap #(into [] (fromOnePolyomino %)))
+          (apply concat)
+          (into #{})))
+
+   :transducer
+   (fn [polyominos]
+     (->> polyominos
+          (r/mapcat #(into [] (fromOnePolyominoTransducer %) %))
+          (into #{})))
+
+   :reducer
+   (fn [polyominos]
+     (->> polyominos
+          (r/mapcat #(into [] (fromOnePolyomino %)))
+          (into #{})))})
+
 (defn generate
   ([]
    (let [initialResult [[[0 0]]]]
      (cons initialResult (generate initialResult))))
   ([polyominos]
-   (let [generated (->> polyominos
-                        (pmap #(into [] (fromOnePolyomino %)))
-                        (apply concat)
-                        (into #{}))]
+   (let [generated ((:tesser GENERATORS) polyominos)]
      (lazy-seq (cons generated (generate generated))))))
 
 (defn nbOfPolyominos
