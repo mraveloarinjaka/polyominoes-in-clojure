@@ -1,0 +1,6 @@
+{:paths   ["src"]
+ :deps    {org.clojure/clojure     {:mvn/version "1.10.3"}
+           tesser.core/tesser.core {:mvn/version "1.0.2"}}
+ :aliases {:outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
+                      :main-opts  ["-m" "antq.core"]}}
+ }
