@@ -1,97 +1,88 @@
 (ns polyominoes.core
-  (:require [clojure.set])
+  (:require [clojure.set]
+            [clojure.core.reducers :as r])
   (:gen-class))
 
 (defn findOrigin
   [polyomino]
-  (reduce 
-    (fn [[resX resY] [x y]] (vector (min resX x) (min resY y)))
-    polyomino))
+  (reduce
+   (fn [[resX resY] [x y]] (vector (min resX x) (min resY y)))
+   polyomino))
 
 (defn translateToOrigin
   [polyomino]
   (let [[originX originY] (findOrigin polyomino)]
-    (map
-      (fn [[x y]] (vector (- x originX) (- y originY)))
-      polyomino)))
+    (mapv
+     (fn [[x y]] (vector (- x originX) (- y originY)))
+     polyomino)))
 
-(defn rotateOnePoint90 
+(defn rotateOnePoint90
   [[x y]]
   (vector (* y -1) x))
 
-(defn rotateOnePoint180 
+(defn rotateOnePoint180
   [[x y]]
   (vector (* x -1) (* y -1)))
 
-(defn rotateOnePoint270 
+(defn rotateOnePoint270
   [[x y]]
   (vector y (* x -1)))
 
 (defn rotate
   [rotator polyomino]
-  (map #(rotator %) polyomino))
+  (mapv rotator polyomino))
 
 (defn mirror
   [polyomino]
-  (map
-    (fn [[x y]] (vector (* x -1) y))
-    polyomino))
+  (mapv
+   (fn [[x y]] (vector (* x -1) y))
+   polyomino))
 
 (defn retrieveRotationsAndMirror
   [polyomino]
-  (let [mirrored (mirror polyomino)]
-    (list
-      polyomino
-      (rotate rotateOnePoint90 polyomino)
-      (rotate rotateOnePoint180 polyomino)
-      (rotate rotateOnePoint270 polyomino)
-      mirrored
-      (rotate rotateOnePoint90 mirrored)
-      (rotate rotateOnePoint180 mirrored)
-      (rotate rotateOnePoint270 mirrored))))
+  ((juxt
+    identity
+    (partial rotate rotateOnePoint90)
+    (partial rotate rotateOnePoint180)
+    (partial rotate rotateOnePoint270)
+    mirror
+    (comp (partial rotate rotateOnePoint90) mirror)
+    (comp (partial rotate rotateOnePoint180) mirror)
+    (comp (partial rotate rotateOnePoint270) mirror))
+   polyomino))
 
 (defn retrieveCanonicalForm
   [polyomino]
   (->> polyomino
        retrieveRotationsAndMirror
-       (pmap (comp vec translateToOrigin sort))
-       (apply sorted-set)
+       (r/map (comp translateToOrigin sort))
+       (into (sorted-set))
        first))
 
 (defn neighbors
   [[x y]]
-  (vector (vector (- x 1) y)
-          (vector (+ x 1) y)
-          (vector x (- y 1))
-          (vector x (+ y 1))))
-
-(defn adjacents
-  [polyomino]
-  (reduce (fn [result point]
-            (reduce 
-              conj 
-              result 
-              (remove (set polyomino) (neighbors point))))
-          #{}
-          polyomino))
+  [[(dec x) y]
+   [(inc x) y]
+   [x (dec y)]
+   [x (inc y)]])
 
 (defn generateFromOnePolyomino
   [polyomino]
   (->> polyomino
-       adjacents
-       (map (comp retrieveCanonicalForm vec #(conj polyomino %)))))
+       (r/mapcat neighbors)
+       (r/remove (set polyomino))
+       (r/map (partial conj polyomino))
+       (r/map retrieveCanonicalForm)))
 
 (defn generate
   ([]
    (let [initialResult [[[0 0]]]]
      (cons initialResult (generate initialResult))))
   ([polyominos]
-   (let [generated 
-         (->> polyominos 
-              (pmap generateFromOnePolyomino)
-              (apply concat)
-              set
-              sequence)]
+   (let [generated
+         (->> polyominos
+              (r/mapcat generateFromOnePolyomino)
+              (into #{}))]
      (lazy-seq (cons generated (generate generated))))))
 
 (defn nbOfPolyominos
