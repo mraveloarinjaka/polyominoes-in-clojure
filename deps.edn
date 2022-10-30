@@ -9,7 +9,7 @@
                   :main-opts ["-m" "cognitect.test-runner"]
                   :exec-fn cognitect.test-runner.api/test}
            :nREPL {:extra-deps {cider/cider-nrepl             {:mvn/version "0.28.6"}
-                                refactor-nrepl/refactor-nrepl {:mvn/version "3.5.5"}}
+                                refactor-nrepl/refactor-nrepl {:mvn/version "3.6.0"}}
                    :main-opts  ["-m" "nrepl.cmdline"
                                 "--middleware" "[cider.nrepl/cider-middleware,refactor-nrepl.middleware/wrap-refactor]"]}}
  }
