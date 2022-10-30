@@ -8,7 +8,7 @@
                                {:git/sha "a522ab2851a2aa5bf9c22a942b45287a3a019310"}}
                   :main-opts ["-m" "cognitect.test-runner"]
                   :exec-fn cognitect.test-runner.api/test}
-           :nREPL {:extra-deps {cider/cider-nrepl             {:mvn/version "0.28.6"}
+           :nREPL {:extra-deps {cider/cider-nrepl             {:mvn/version "0.28.7"}
                                 refactor-nrepl/refactor-nrepl {:mvn/version "3.6.0"}}
                    :main-opts  ["-m" "nrepl.cmdline"
                                 "--middleware" "[cider.nrepl/cider-middleware,refactor-nrepl.middleware/wrap-refactor]"]}}
