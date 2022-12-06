@@ -1,6 +1,6 @@
 {:paths   ["src"]
  :deps    {org.clojure/clojure     {:mvn/version "1.11.1"}
-           tesser.core/tesser.core {:mvn/version "1.0.5"}}
+           tesser.core/tesser.core {:mvn/version "1.0.6"}}
  :aliases {:exec {:extra-deps {org.babashka/cli {:mvn/version "0.5.40"}}
                   :exec-fn polyominoes.cli/-main
                   :main-opts ["-m" "babashka.cli.exec"]
