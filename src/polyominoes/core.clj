@@ -90,14 +90,6 @@
    (map (partial conj polyomino))
    (map retrieveCanonicalForm)))
 
-;(def GENERATORS
-;  {:transducer
-;   (fn [polyominoes]
-;     (->> polyominoes
-;          (r/mapcat #(eduction (fromOnePolyominoTransducer %) %))
-;          (into #{})))
-;          )
-
 (defmethod gen/generate :default
   [{::gen/keys [starting-from generate-from-one]}]
   (println ::generate)
@@ -113,7 +105,8 @@
   ([args polyominoes]
    (let [input (assoc args
                       ::gen/starting-from polyominoes
-                      ::gen/generate-from-one fromOnePolyomino)
+                      ::gen/generate-from-one fromOnePolyomino
+                      ::gen/generate-from-one-xf fromOnePolyominoTransducer)
          generated (gen/generate input)]
      (lazy-seq (cons generated (generate args generated))))))
 
@@ -125,7 +118,7 @@
 
 (comment
 
-  (nbOfPolyominoes {:cells 5})
+  (nbOfPolyominoes {:cells 10})
   (nbOfPolyominoes {:cells 5 :generator :transducer})
   (nbOfPolyominoes {:cells 5 :generator :reducer})
   (nbOfPolyominoes {:cells 5 :generator :tesser})
