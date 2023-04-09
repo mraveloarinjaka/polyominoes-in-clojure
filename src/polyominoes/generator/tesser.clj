@@ -1,4 +1,4 @@
-(ns polyominoes.tesser
+(ns polyominoes.generator.tesser
   (:require [polyominoes.generator :as gen]
             [tesser.core :as t]))
 

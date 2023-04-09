@@ -1,4 +1,4 @@
-(ns polyominoes.transducer
+(ns polyominoes.generator.transducer
   (:require [polyominoes.generator :as gen]
             [clojure.core.reducers :as r]))
 
