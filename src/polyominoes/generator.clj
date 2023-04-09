@@ -1,3 +1,4 @@
-(ns polyominoes.generator)
+(ns polyominoes.generator
+  (:require [methodical.core :as m]))
 
-(defmulti generate ::type)
+(m/defmulti generate ::type)

@@ -1,10 +1,10 @@
 (ns polyominoes.generator.transducer
-  (:require [polyominoes.generator :as gen]
-            [clojure.core.reducers :as r]))
+  (:require [clojure.core.reducers :as r]
+            [methodical.core :as m]
+            [polyominoes.generator :as gen]))
 
-(defmethod gen/generate :transducer
+(m/defmethod gen/generate :transducer
   [{::gen/keys [starting-from generate-from-one-xf]}]
-  (println ::generate)
   (->> starting-from
        (r/mapcat #(eduction (generate-from-one-xf %) %))
        (into #{})))

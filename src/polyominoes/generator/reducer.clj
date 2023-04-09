@@ -1,10 +1,10 @@
 (ns polyominoes.generator.reducer
-  (:require [polyominoes.generator :as gen]
-            [clojure.core.reducers :as r]))
+  (:require [clojure.core.reducers :as r]
+            [methodical.core :as m]
+            [polyominoes.generator :as gen]))
 
-(defmethod gen/generate :reducer
+(m/defmethod gen/generate :reducer
   [{::gen/keys [starting-from generate-from-one]}]
-  (println ::generate)
   (->> starting-from
        (r/mapcat generate-from-one)
        (into #{})))
