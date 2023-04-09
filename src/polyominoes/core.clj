@@ -1,20 +1,20 @@
 (ns polyominoes.core
-  (:require [clojure.set]
-            [clojure.core.reducers :as r]
+  (:require [clojure.core.reducers :as r]
+            [clojure.set]
             [tesser.core :as t]))
 
 (defn findOrigin
   [polyomino]
   (reduce
-    (fn [[resX resY] [x y]] [(min resX x) (min resY y)])
-    polyomino))
+   (fn [[resX resY] [x y]] [(min resX x) (min resY y)])
+   polyomino))
 
 (defn translateToOrigin
   [polyomino]
   (let [[originX originY] (findOrigin polyomino)]
     (mapv
-      (fn [[x y]] [(- x originX) (- y originY)])
-      polyomino)))
+     (fn [[x y]] [(- x originX) (- y originY)])
+     polyomino)))
 
 (defn rotateOnePoint90
   [[x y]]
@@ -38,20 +38,20 @@
 (defn mirror
   [polyomino]
   (mapv
-    (fn [[x y]] [(* x -1) y])
-    polyomino))
+   (fn [[x y]] [(* x -1) y])
+   polyomino))
 
 (defn retrieveRotationsAndMirror
   [polyomino]
   ((juxt
-     identity
-     (rotate rotateOnePoint90)
-     (rotate rotateOnePoint180)
-     (rotate rotateOnePoint270)
-     mirror
-     (comp (rotate rotateOnePoint90) mirror)
-     (comp (rotate rotateOnePoint180) mirror)
-     (comp (rotate rotateOnePoint270) mirror))
+    identity
+    (rotate rotateOnePoint90)
+    (rotate rotateOnePoint180)
+    (rotate rotateOnePoint270)
+    mirror
+    (comp (rotate rotateOnePoint90) mirror)
+    (comp (rotate rotateOnePoint180) mirror)
+    (comp (rotate rotateOnePoint270) mirror))
    polyomino))
 
 (defn retrieveCanonicalForm
@@ -85,10 +85,10 @@
 (defn fromOnePolyominoTransducer
   [polyomino]
   (comp
-    (mapcat neighbors)
-    (remove (set polyomino))
-    (map (partial conj polyomino))
-    (map retrieveCanonicalForm)))
+   (mapcat neighbors)
+   (remove (set polyomino))
+   (map (partial conj polyomino))
+   (map retrieveCanonicalForm)))
 
 (defonce CHUNK 100)
 
@@ -141,6 +141,4 @@
   (nbOfPolyominoes {:cells 5 :generator :transducer})
   (nbOfPolyominoes {:cells 5 :generator :reducer})
   (nbOfPolyominoes {:cells 12})
-  (nbOfPolyominoes {:cells 12 :generator :reducer})
-
-  )
+  (nbOfPolyominoes {:cells 12 :generator :reducer}))
