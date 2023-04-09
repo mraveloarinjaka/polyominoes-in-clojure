@@ -1,12 +1,9 @@
 {:paths   ["src"]
  :deps    {org.clojure/clojure     {:mvn/version "1.11.1"}
            tesser.core/tesser.core {:mvn/version "1.0.6"}}
- :aliases {:exec {:extra-deps {org.babashka/cli {:mvn/version "0.6.45"}}
+ :aliases {:exec {:extra-deps {org.babashka/cli {:mvn/version "0.6.50"}}
                   :exec-fn polyominoes.cli/-main
-                  :main-opts ["-m" "babashka.cli.exec"]
-                  :org.babashka/cli {:coerce {:cells :long}}}
-           :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
-                      :main-opts  ["-m" "antq.core"]}
+                  :main-opts ["-m" "babashka.cli.exec"]}
            :test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/sha "7284cda41fb9edc0f3bc6b6185cfb7138fc8a023"}}

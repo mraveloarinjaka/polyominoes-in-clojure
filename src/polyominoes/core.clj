@@ -129,6 +129,7 @@
      (lazy-seq (cons generated (generate generator generated))))))
 
 (defn nbOfPolyominoes
+  {:org.babashka/cli {:coerce {:cells :long}}}
   [{:keys [cells generator]
     :or {generator :tesser}}]
   {:pre [(number? cells) (> cells 0)]}
