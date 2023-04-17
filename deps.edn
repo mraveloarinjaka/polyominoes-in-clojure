@@ -2,7 +2,7 @@
  :deps    {org.clojure/clojure     {:mvn/version "1.11.1"}
            tesser.core/tesser.core {:mvn/version "1.0.6"}
            methodical/methodical {:mvn/version "0.15.1"}}
- :aliases {:exec {:extra-deps {org.babashka/cli {:mvn/version "0.6.50"}}
+ :aliases {:exec {:extra-deps {org.babashka/cli {:mvn/version "0.7.51"}}
                   :exec-fn polyominoes.cli/-main
                   :main-opts ["-m" "babashka.cli.exec"]}
            :test {:extra-paths ["test"]
