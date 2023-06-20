@@ -5,7 +5,7 @@
            org.clojure/clojure     {:mvn/version "1.11.1"}
            tesser.core/tesser.core {:mvn/version "1.0.6"}}
  :aliases {:dev {:extra-paths ["dev"]}
-           :exec {:extra-deps {org.babashka/cli {:mvn/version "0.7.51"}}
+           :exec {:extra-deps {org.babashka/cli {:mvn/version "0.7.52"}}
                   :exec-fn polyominoes.cli/-main
                   :main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
