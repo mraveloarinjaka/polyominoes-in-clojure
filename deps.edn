@@ -11,7 +11,7 @@
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.012"}
-                                org.bytedeco/mkl-platform-redist {:mvn/version "2022.2-1.5.8"}
+                                org.bytedeco/mkl-platform-redist {:mvn/version "2023.1-1.5.9"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.9"}
                                 uncomplicate/neanderthal {:mvn/version "0.46.0"}}}
            :test {:exec-fn cognitect.test-runner.api/test
