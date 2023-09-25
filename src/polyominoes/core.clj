@@ -1,5 +1,6 @@
 (ns polyominoes.core
-  (:require [clojure.core.reducers :as r]
+  (:require [babashka.cli :as cli]
+            [clojure.core.reducers :as r]
             [clojure.set]
             [methodical.core :as m]
             [polyominoes.generator :as gen]))
@@ -99,7 +100,7 @@
        (into #{})))
 
 (m/defmethod gen/generate :before :default
-  [{generator ::gen/type nb-calls :nb-calls 
+  [{generator ::gen/type nb-calls :nb-calls
     :as args}]
   (println "generator" generator "called" nb-calls "times")
   args)
@@ -119,16 +120,32 @@
      (lazy-seq (cons generated (generate args generated))))))
 
 (defn nbOfPolyominoes
-  {:org.babashka/cli {:coerce {:cells :long}}}
+  {:org.babashka/cli {:coerce {:cells :long
+                               :generator :keyword}
+                      :args->opts [:cells]}}
   [{:keys [cells generator] :or {generator :default} :as args}]
   {:pre [(number? cells) (> cells 0)]}
   (count (nth (generate (assoc args ::gen/type generator)) (dec cells))))
 
+(defn -main
+  [& args]
+  (let [cli-spec (get (meta #'nbOfPolyominoes) :org.babashka/cli)]
+    (println (nbOfPolyominoes (cli/parse-opts args cli-spec)))))
+
 (comment
 
-  (nbOfPolyominoes {:cells 2})
+  (require '[babashka.cli.exec :as exec])
+  (exec/-main 'polyominoes.core 'nbOfPolyominoes :cells "5" :generator "tesser")
+
+  (cli/parse-opts ["5" :generator "tesser"] {:coerce {:cells :long
+                                                      :generator :keyword}
+                                             :args->opts [:cells]})
+
+  (-main "5" :generator "tesser")
+
+  (nbOfPolyominoes {:cells 5})
   (nbOfPolyominoes {:cells 5 :generator :transducer})
-  (nbOfPolyominoes {:cells 5 :generator :reducer})
   (nbOfPolyominoes {:cells 5 :generator :tesser})
+  (nbOfPolyominoes {:cells 5 :generator :reducer})
 
   (comment))

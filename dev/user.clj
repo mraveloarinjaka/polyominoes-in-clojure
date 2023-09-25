@@ -1,6 +1,5 @@
 (ns user
   (:require [borkdude.deflet :refer [deflet]]
-            [polyominoes.core-native]
             [taoensso.timbre :as log]))
 
 (log/set-min-level! :debug)
@@ -8,6 +7,8 @@
 (println "user.clj loaded...")
 
 (comment
+
+  (require '[polyominoes.core-native])
 
   (require '[uncomplicate.clojurecl.core :as opencl]
            '[uncomplicate.commons.core :refer [with-release]]
