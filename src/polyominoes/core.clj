@@ -2,6 +2,7 @@
   (:require [babashka.cli :as cli]
             [clojure.core.reducers :as r]
             [clojure.set]
+            [taoensso.timbre :as log]
             [methodical.core :as m]
             [polyominoes.generator :as gen]))
 
@@ -102,7 +103,7 @@
 (m/defmethod gen/generate :before :default
   [{generator ::gen/type nb-calls :nb-calls
     :as args}]
-  (println "generator" generator "called" nb-calls "times")
+  (log/debug "generator" generator "called" nb-calls "times")
   args)
 
 (defn- generate
