@@ -12,7 +12,7 @@
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.113"}
                                 org.bytedeco/mkl-platform-redist {:mvn/version "2024.0-1.5.10"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.16"}
-                                uncomplicate/neanderthal {:mvn/version "0.48.0"}}}
+                                uncomplicate/neanderthal {:mvn/version "0.49.1"}}}
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/sha "7284cda41fb9edc0f3bc6b6185cfb7138fc8a023"}}
