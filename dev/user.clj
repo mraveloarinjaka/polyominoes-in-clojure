@@ -1,10 +1,15 @@
 (ns user
   (:require [borkdude.deflet :refer [deflet]]
+            [clojure.repl.deps :as deps]
             [taoensso.timbre :as log]))
 
 (log/set-min-level! :debug)
 
 (println "user.clj loaded...")
+
+(comment
+  (deps/add-lib 'com.taoensso/timbre)
+  (comment))
 
 (comment
 
@@ -38,6 +43,7 @@
                      -4.81, 3.55, -1.51, 6.18, 5.58] {:layout :row}))
 
     (auxil/sort-! m))
+
 
   (comment))
 

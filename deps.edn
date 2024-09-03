@@ -1,20 +1,19 @@
 {:paths   ["src"]
  :deps    {com.taoensso/timbre {:mvn/version "6.5.0"}
            io.github.borkdude/deflet {:mvn/version "0.1.0"}
-           methodical/methodical {:mvn/version "0.15.1"}
+           methodical/methodical {:mvn/version "1.0.123"}
            org.clojure/clojure     {:mvn/version "1.12.0"}
-           org.babashka/cli {:mvn/version "0.8.58"}
+           org.babashka/cli {:mvn/version "0.8.60"}
            tesser.core/tesser.core {:mvn/version "1.0.6"}}
  :aliases {:dev {:extra-paths ["dev"]}
            :exec {:main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.113"}
-                                org.bytedeco/mkl-platform-redist {:mvn/version "2024.0-1.5.10"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.16"}
-                                uncomplicate/neanderthal {:mvn/version "0.48.0"}}}
+                                uncomplicate/neanderthal {:mvn/version "0.49.1"}}}
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner
-                               {:git/sha "7284cda41fb9edc0f3bc6b6185cfb7138fc8a023"}}
+                               {:git/sha "9d36f36ff541dac680a05010e4348c744333f191"}}
                   :extra-paths ["test"]
                   :main-opts ["-m" "cognitect.test-runner"]}}}
