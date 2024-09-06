@@ -1,10 +1,11 @@
 (ns polyominoes.core
   (:require [babashka.cli :as cli]
             [clojure.core.reducers :as r]
+            [clojure.pprint :as pp]
             [clojure.set]
-            [taoensso.timbre :as log]
             [methodical.core :as m]
-            [polyominoes.generator :as gen]))
+            [polyominoes.generator :as gen]
+            [taoensso.timbre :as log]))
 
 (defn- findOrigin
   [polyomino]
@@ -94,16 +95,16 @@
    (map retrieveCanonicalForm)))
 
 (m/defmethod gen/generate :default
-  [{::gen/keys [starting-from generate-from-one]}]
+  [starting-from {::gen/keys [generate-from-one]}]
   (->> starting-from
        (pmap #(into [] (generate-from-one %)))
        (apply concat)
        (into #{})))
 
 (m/defmethod gen/generate :before :default
-  [{generator ::gen/type nb-calls :nb-calls
+  [_ {generator ::gen/type nb-calls :nb-calls
     :as args}]
-  (log/debug "generator" generator "called" nb-calls "times")
+  (log/debug (pp/cl-format nil "generator ~a called ~r time~:p" generator nb-calls))
   args)
 
 (defn- generate
@@ -113,11 +114,10 @@
   ([args polyominoes]
    (let [args (update args :nb-calls (fnil inc 0))
          input (assoc args
-                      ::gen/starting-from polyominoes
                       ::gen/generate-from-one fromOnePolyomino
                       ::gen/generate-from-one-xf fromOnePolyominoTransducer)
          ;generated (m/trace gen/generate input)
-         generated (gen/generate input)]
+         generated (gen/generate polyominoes input)]
      (lazy-seq (cons generated (generate args generated))))))
 
 (defn nbOfPolyominoes
@@ -137,7 +137,7 @@
 
   (-main "5" :generator "tesser")
 
-  (nbOfPolyominoes {:cells 5})
+  (nbOfPolyominoes {:cells 6})
   (nbOfPolyominoes {:cells 5 :generator :transducer})
   (nbOfPolyominoes {:cells 5 :generator :tesser})
   (nbOfPolyominoes {:cells 5 :generator :reducer})

@@ -1,4 +1,8 @@
 (ns polyominoes.generator
   (:require [methodical.core :as m]))
 
-(m/defmulti generate ::type)
+(defn- dispatch-on-generator
+  [_ {::keys [type]}]
+  type)
+
+(m/defmulti generate dispatch-on-generator)

@@ -4,7 +4,7 @@
             [polyominoes.generator :as gen]))
 
 (m/defmethod gen/generate :reducer
-  [{::gen/keys [starting-from generate-from-one]}]
+  [starting-from {::gen/keys [generate-from-one]}]
   (->> starting-from
        (r/mapcat generate-from-one)
        (into #{})))

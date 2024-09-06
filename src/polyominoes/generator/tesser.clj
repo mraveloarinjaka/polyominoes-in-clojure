@@ -6,7 +6,7 @@
 (defonce CHUNK 100)
 
 (m/defmethod gen/generate :tesser
-  [{::gen/keys [starting-from generate-from-one]}]
+  [starting-from  {::gen/keys [generate-from-one]}]
   (->> (t/map #(into [] (generate-from-one %)))
        (t/into [])
        (t/tesser (t/chunk CHUNK starting-from))
