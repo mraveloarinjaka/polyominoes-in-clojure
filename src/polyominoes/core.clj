@@ -135,13 +135,6 @@
 
 (comment
 
-  (require '[babashka.cli.exec :as exec])
-  (exec/-main 'polyominoes.core 'nbOfPolyominoes :cells "5" :generator "tesser")
-
-  (cli/parse-opts ["5" :generator "tesser"] {:coerce {:cells :long
-                                                      :generator :keyword}
-                                             :args->opts [:cells]})
-
   (-main "5" :generator "tesser")
 
   (nbOfPolyominoes {:cells 5})

@@ -1,7 +1,10 @@
 (ns polyominoes.core-test
-  (:require [clojure.test :refer :all]
-            [polyominoes.core :refer :all]))
+  (:require [clojure.test :refer [deftest testing is]]
+            [polyominoes.core :refer [nbOfPolyominoes]]))
 
-(deftest dummy-test
-  (testing "enrich me"
-    (is (= 1 1))))
+(deftest nbOfPolyominoes-test
+  (testing "generators"
+    (is (= 12 (nbOfPolyominoes {:cells 5})))
+    (is (= 12 (nbOfPolyominoes {:cells 5 :generator :tesser})))
+    (is (= 12 (nbOfPolyominoes {:cells 5 :generator :transducer})))
+    (is (= 12 (nbOfPolyominoes {:cells 5 :generator :reducer})))))

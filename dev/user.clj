@@ -1,6 +1,7 @@
 (ns user
   (:require [borkdude.deflet :refer [deflet]]
             [clojure.repl.deps :as deps]
+            [clojure.test :as xunit]
             [taoensso.timbre :as log]))
 
 (log/set-min-level! :debug)
@@ -9,6 +10,11 @@
 
 (comment
   (deps/add-lib 'com.taoensso/timbre)
+  (deps/add-lib 'com.taoensso/timbre {:mvn/version "6.5.0"})
+  (comment))
+
+(comment
+  (xunit/run-tests 'polyominoes.core-test)
   (comment))
 
 (comment
@@ -43,7 +49,6 @@
                      -4.81, 3.55, -1.51, 6.18, 5.58] {:layout :row}))
 
     (auxil/sort-! m))
-
 
   (comment))
 
