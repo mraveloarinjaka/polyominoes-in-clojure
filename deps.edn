@@ -16,4 +16,5 @@
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/sha "9d36f36ff541dac680a05010e4348c744333f191"}}
                   :extra-paths ["test"]
+                  :jvm-opts ["-Dtaoensso.timbre.config.edn={:min-level :info}"]
                   :main-opts ["-m" "cognitect.test-runner"]}}}
