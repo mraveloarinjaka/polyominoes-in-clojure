@@ -4,13 +4,27 @@
             [clojure.test :as xunit]
             [taoensso.timbre :as log]))
 
+(set! *warn-on-reflection* true)
+
 (log/set-min-level! :debug)
 
 (println "user.clj loaded...")
 
 (comment
-  (deps/add-lib 'com.taoensso/timbre)
-  (deps/add-lib 'com.taoensso/timbre {:mvn/version "6.5.0"})
+
+  (deps/add-lib 'criterium/criterium)
+  (require '[criterium.core :as crt])
+  (require '[polyominoes.core])
+
+  (let [cells 5]
+    (doseq [generator [:default :reducer :tesser :transducer]]
+      (log/set-min-level! :info)
+      (log/info "generator" generator)
+      (crt/quick-bench (polyominoes.core/nbOfPolyominoes {:cells cells :generator  generator}))))
+
+  (crt/with-progress-reporting
+    (crt/quick-bench (polyominoes.core/nbOfPolyominoes {:cells 5})))
+
   (comment))
 
 (comment
