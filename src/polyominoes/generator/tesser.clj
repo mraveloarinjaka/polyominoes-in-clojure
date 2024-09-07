@@ -3,12 +3,11 @@
             [polyominoes.generator :as gen]
             [tesser.core :as t]))
 
-(defonce CHUNK 100)
+(def CHUNK 100)
 
 (m/defmethod gen/generate :tesser
   [starting-from  {::gen/keys [generate-from-one]}]
-  (->> (t/map #(into [] (generate-from-one %)))
-       (t/into [])
-       (t/tesser (t/chunk CHUNK starting-from))
-       (apply concat)
-       (into #{})))
+  (->> (t/mapcat generate-from-one)
+       (t/set)
+       (t/tesser (t/chunk CHUNK starting-from))))
+
