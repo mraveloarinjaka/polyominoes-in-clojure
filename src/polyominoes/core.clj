@@ -67,6 +67,7 @@
        first))
 
 #_(retrieveCanonicalForm [[0 1] [1 1] [0 0] [1 2]])
+#_(retrieveCanonicalForm #{[0 1] [1 1] [0 0] [1 2]})
 
 (defn- neighbors
   [[x y]]
@@ -102,8 +103,9 @@
        (into #{})))
 
 (m/defmethod gen/generate :before :default
-  [_ {generator ::gen/type nb-calls :nb-calls
-    :as args}]
+  [_ {generator ::gen/type
+      nb-calls :nb-calls
+      :as args}]
   (log/debug (pp/cl-format nil "generator ~a called ~r time~:p" generator nb-calls))
   args)
 
@@ -114,6 +116,8 @@
   ([args polyominoes]
    (let [args (update args :nb-calls (fnil inc 0))
          input (assoc args
+                      ::gen/neighbors neighbors
+                      ::gen/retrieve-canonical-form retrieveCanonicalForm
                       ::gen/generate-from-one fromOnePolyomino
                       ::gen/generate-from-one-xf fromOnePolyominoTransducer)
          ;generated (m/trace gen/generate input)
@@ -124,7 +128,9 @@
   {:org.babashka/cli {:coerce {:cells :long
                                :generator :keyword}
                       :args->opts [:cells]}}
-  [{:keys [cells generator] :or {generator :default} :as args}]
+  [{:keys [cells generator]
+    :or {generator :default}
+    :as args}]
   {:pre [(number? cells) (> cells 0)]}
   (count (nth (generate (assoc args ::gen/type generator)) (dec cells))))
 
@@ -138,8 +144,11 @@
   (-main "5" :generator "tesser")
 
   (nbOfPolyominoes {:cells 6})
-  (nbOfPolyominoes {:cells 5 :generator :transducer})
-  (nbOfPolyominoes {:cells 5 :generator :tesser})
-  (nbOfPolyominoes {:cells 5 :generator :reducer})
+  (nbOfPolyominoes {:cells 5
+                    :generator :transducer})
+  (nbOfPolyominoes {:cells 12
+                    :generator :tesser})
+  (nbOfPolyominoes {:cells 5
+                    :generator :reducer})
 
   (comment))
