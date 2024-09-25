@@ -21,9 +21,10 @@
 #_{:clj-kondo/ignore [:unresolved-var]}
 (m/defmethod gen/generate :tesser
   [starting-from {::gen/keys [neighbors retrieve-canonical-form]}]
-  (->> (t/mapcat #(fromOnePolyomino % neighbors retrieve-canonical-form))
-       (t/set)
-       (t/tesser (t/chunk CHUNK starting-from))))
+  (->>
+   (t/mapcat #(fromOnePolyomino % neighbors retrieve-canonical-form))
+   (t/set)
+   (t/tesser (t/chunk CHUNK starting-from))))
 
 (comment
 
