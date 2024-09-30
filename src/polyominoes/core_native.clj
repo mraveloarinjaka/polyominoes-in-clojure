@@ -1,9 +1,10 @@
 (ns polyominoes.core-native
   (:require [borkdude.deflet :refer [deflet]]
+            [polyominoes.core-native-patches]
+            [taoensso.timbre :as log]
             [tech.v3.datatype.argops :as ops]
             [tech.v3.libs.neanderthal]
-            [uncomplicate.commons.core :refer [release with-release]]
-            [taoensso.timbre :as log]
+            [uncomplicate.commons.core :refer [release with-release] :as ccore]
             [uncomplicate.neanderthal
              [core :as ucore]
              [math :as math]
@@ -77,24 +78,47 @@
   (with-release [to-origin-v (->to-origin-v polyomino)]
     (ucore/axpby! -1 to-origin-v 1 polyomino)))
 
+#_(let [polyomino (native/dge R2 2 [1 1 1 2])]
+    (->to-origin! polyomino))
+; #RealGEMatrix[double, mxn:2x2, layout:column]
+;    ▥       ↓       ↓       ┓    
+;    →       0.00    0.00         
+;    →       0.00    1.00         
+;    ┗                       ┛    
+; 
+
 (defn ->cols-hash-base-N
   [polyomino]
   (with-release [N (ucore/ncols polyomino)
                  n-v (native/dv [1 N])]
     (ucore/mv (ucore/trans polyomino) n-v)))
 
+#_(with-release [polyomino (native/dge R2 3 [0 1 1 1 1 2])]
+    (->cols-hash-base-N (->to-origin! polyomino)))
+; #RealBlockVector[double, n:3, stride:1]
+; [   0.00    1.00    4.00 ]
+; 
+
 (defn ->permutation-idx
   [polyomino]
   (with-release [hash-base-N (->cols-hash-base-N polyomino)]
     (->> hash-base-N
          ops/argsort
-         (map inc)
+         (mapv inc)
          native/iv)))
+
+#_(with-release [polyomino (native/dge R2 3 [1 1 1 2 0 1])
+                 idx (->permutation-idx polyomino)]
+    (print idx))
 
 (defn ->canonical-repr!
   [polyomino]
   (with-release [permutation-idx (->permutation-idx (->to-origin! polyomino))]
     (auxil/permute-cols! polyomino permutation-idx)))
+
+#_(with-release [polyomino (native/dge R2 3 [1 1 1 2 0 1])]
+    (->canonical-repr! polyomino)
+    (print polyomino))
 
 (defn lexicographic-compare
   [p1 p2]
@@ -114,11 +138,15 @@
 (defn ->canonical-form!
   [polyomino]
   (with-release [all-forms (->all-forms polyomino)]
-    (let [canonical-form  (->> all-forms
-                               (mapv ->canonical-repr!)
-                               (apply sorted-set-by lexicographic-compare)
-                               first)]
+    (let [canonical-form (->> all-forms
+                              (mapv ->canonical-repr!)
+                              (apply sorted-set-by lexicographic-compare)
+                              first)]
       (ucore/copy! canonical-form polyomino))))
+
+#_(with-release [polyomino (native/dge R2 3 [1 1 1 2 0 1])]
+    (->canonical-form! polyomino)
+    (print polyomino))
 
 (def NB-NEIGHBORS 4)
 (def NB-ROWS-PER-NEIGHBOR 2)
@@ -129,6 +157,15 @@
   [xy]
   (let [xy4 (native/dge NB-ROWS-PER-NEIGHBOR NB-NEIGHBORS (cycle xy))]
     (ucore/axpy! TRANSLATIONS-TO-NEIGHBORS xy4)))
+
+#_(with-release [origin (native/dge R2 1 [1 1])]
+    (->one-point-neighbors origin))
+; #RealGEMatrix[double, mxn:2x4, layout:column]
+;    ▥       ↓       ↓       ↓       ↓       ┓    
+;    →       1.00    0.00    1.00    2.00         
+;    →       2.00    1.00    0.00    1.00         
+;    ┗                                       ┛    
+; 
 
 (defn ith-point-kth-neighbor-starting-line
   [ith kth]
@@ -154,6 +191,9 @@
       (->canonical-form! neighbor))
     neighbors))
 
+#_(with-release [origin (native/dge R2 1 [0 0])]
+    (->neighbors origin))
+
 (defn has-duplicate?
   [previous-point current-point]
   (if (= previous-point current-point)
@@ -175,13 +215,21 @@
           :when (valid? neighbor)]
       neighbor)))
 
+#_(with-release [origin (native/dge R2 1 [1 1])]
+    (valid-neighbors (->neighbors origin)))
+
 (defn from-one-polyomino
   [polyomino]
   (with-release [neighbors (->neighbors polyomino)]
     (mapv ucore/copy (valid-neighbors neighbors))))
 
+#_(with-release [origin (native/dge R2 1 [1 1])]
+    (->> (from-one-polyomino origin)
+         (apply sorted-set-by lexicographic-compare)))
+
 (defn from-polyominoes
   [polyominoes]
+  (log/debug :from-polyominoes)
   (with-release [generated (->> polyominoes
                                 (pmap from-one-polyomino)
                                 (apply concat))]
@@ -218,32 +266,15 @@
 
 (comment
 
-  (-main "5")
-
   (deflet
 
-    (count-n 3)
+    (count-n 10)
 
     #_>)
 
   (deflet
 
     (take 3 (generate))
-
-    #_>)
-
-  (deflet
-
-    (def x (native/dv 2 1))
-    (def y (native/dv 1 2))
-    (def z (native/dv 1 1))
-    (def xyz (native/dge 2 3 (concat x y z)))
-    (def neighbors (->neighbors xyz))
-
-    ;(->cols-hash-base-N xyz)
-    (def z2 (native/dv 0.0 1.0))
-    (def z3 (native/dv -0.0 1.0))
-    (= z3 z2)
 
     #_>)
 

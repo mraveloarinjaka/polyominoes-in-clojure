@@ -19,12 +19,16 @@
   (deps/add-lib 'criterium/criterium)
   (require '[criterium.core :as crt])
 
-  (let [cells 5]
+  (let [cells 9]
     (doseq [generator [:default :reducer :tesser :transducer]]
       (log/set-min-level! :info)
       (log/info "generator" generator)
       (crt/quick-bench (polyominoes.core/nbOfPolyominoes {:cells cells
                                                           :generator generator}))))
+
+  (require '[polyominoes.core-native :as poly-pnative])
+
+  (crt/quick-bench (poly-pnative/count-n 9))
 
   (crt/with-progress-reporting
     (crt/quick-bench (polyominoes.core/nbOfPolyominoes {:cells 9
@@ -38,10 +42,18 @@
 
 (comment
 
+  (require '[polyominoes.core-native :as pnative])
+
+  (pnative/-main "5")
+
+  (comment))
+
+(comment
+
   (require '[polyominoes.core-native])
 
-  (require '[uncomplicate.clojurecl.core :as opencl]
-           '[uncomplicate.commons.core :refer [with-release]]
+  (require #_'[uncomplicate.clojurecl.core :as opencl]
+   '[uncomplicate.commons.core :refer [with-release]]
            '[uncomplicate.fluokitten.core :as kitten :refer [foldmap]]
            '[uncomplicate.neanderthal
              [core :as ucore :refer [dot copy asum copy! row mv mm rk axpy entry! subvector trans mm! zero]]
