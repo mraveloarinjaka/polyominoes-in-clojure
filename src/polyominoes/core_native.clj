@@ -1,6 +1,6 @@
 (ns polyominoes.core-native
   (:require [borkdude.deflet :refer [deflet]]
-            [polyominoes.core-native-patches]
+            [tech.v3.datatype.protocols-patches]
             [taoensso.timbre :as log]
             [tech.v3.datatype.argops :as ops]
             [tech.v3.libs.neanderthal]
@@ -268,7 +268,7 @@
 
   (deflet
 
-    (count-n 10)
+    (count-n 8)
 
     #_>)
 
