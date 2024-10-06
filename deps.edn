@@ -8,7 +8,9 @@
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :exec {:main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
-                              "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
+                              "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
+                              ;"-Djdk.attach.allowAttachSelf"
+                              ]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.116"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.16"}
                                 uncomplicate/neanderthal {:mvn/version "0.49.1"}}}
