@@ -1,6 +1,5 @@
 (ns polyominoes.core-native
   (:require [borkdude.deflet :refer [deflet]]
-            [tech.v3.datatype.protocols-patches]
             [taoensso.timbre :as log]
             [tech.v3.datatype.argops :as ops]
             [tech.v3.libs.neanderthal]
