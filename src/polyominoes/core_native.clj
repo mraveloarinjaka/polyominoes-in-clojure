@@ -10,7 +10,7 @@
              [native :as native]
              [auxil :as auxil]]))
 
-(log/set-ns-min-level! :info)
+(log/set-ns-min-level! :debug)
 
 (defn rotate90!
   [polyomino]
@@ -157,15 +157,6 @@
   (let [xy4 (native/dge NB-ROWS-PER-NEIGHBOR NB-NEIGHBORS (cycle xy))]
     (ucore/axpy! TRANSLATIONS-TO-NEIGHBORS xy4)))
 
-#_(with-release [origin (native/dge R2 1 [1 1])]
-    (->one-point-neighbors origin))
-; #RealGEMatrix[double, mxn:2x4, layout:column]
-;    ▥       ↓       ↓       ↓       ↓       ┓    
-;    →       1.00    0.00    1.00    2.00         
-;    →       2.00    1.00    0.00    1.00         
-;    ┗                                       ┛    
-; 
-
 (defn ith-point-kth-neighbor-starting-line
   [ith kth]
   (let [number-of-rows-for-neighbors (* NB-NEIGHBORS NB-ROWS-PER-NEIGHBOR)]
@@ -204,7 +195,7 @@
   (let [invalid-point (native/dv -2 -2)]
     (nil? (:duplicate (reduce has-duplicate? invalid-point (ucore/cols polyomino))))))
 
-(defn valid-neighbors
+(defn ->valid-neighbors
   [neighbors]
   (let [M (ucore/mrows neighbors)
         nb-neighbors (/ M NB-ROWS-PER-NEIGHBOR)
@@ -215,12 +206,14 @@
       neighbor)))
 
 #_(with-release [origin (native/dge R2 1 [1 1])]
-    (valid-neighbors (->neighbors origin)))
+    (->valid-neighbors (->neighbors origin)))
 
 (defn from-one-polyomino
   [polyomino]
   (with-release [neighbors (->neighbors polyomino)]
-    (mapv ucore/copy (valid-neighbors neighbors))))
+    (when-let [valid-neighbors (seq (->valid-neighbors neighbors))]
+      (log/trace :valid-neighbors (count valid-neighbors))
+      (mapv ucore/copy valid-neighbors))))
 
 #_(with-release [origin (native/dge R2 1 [1 1])]
     (->> (from-one-polyomino origin)
@@ -228,12 +221,11 @@
 
 (defn from-polyominoes
   [polyominoes]
-  (log/debug :from-polyominoes)
   (with-release [generated (->> polyominoes
                                 (pmap from-one-polyomino)
+                                (filter seq)
                                 (apply concat))]
-    (for [polyomino (apply sorted-set-by lexicographic-compare generated)]
-      (ucore/copy polyomino))))
+    (mapv ucore/copy (apply sorted-set-by lexicographic-compare generated))))
 
 (defn generate
   ([]
@@ -249,8 +241,6 @@
   (loop [n 1 polyominoes (vector (native/dge R2 1 [0 0]))]
     (if (< n N)
       (let [next-polyominoes (from-polyominoes polyominoes)]
-        (log/debug :first (first next-polyominoes))
-        (log/debug :last (last next-polyominoes))
         (release polyominoes)
         (recur (inc n) next-polyominoes))
       (let [result (count polyominoes)]
@@ -267,7 +257,13 @@
 
   (deflet
 
-    (count-n 8)
+    (count-n 5)
+
+    #_>)
+
+  (deflet
+
+    (count-n 11)
 
     #_>)
 
@@ -277,5 +273,6 @@
 
     #_>)
 
+  *e
   (comment))
 
