@@ -15,7 +15,7 @@
                               ]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.119"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.16"}
-                                uncomplicate/neanderthal {:mvn/version "0.49.2"}}}
+                                uncomplicate/neanderthal {:mvn/version "0.50.0"}}}
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/sha "9d36f36ff541dac680a05010e4348c744333f191"}}
