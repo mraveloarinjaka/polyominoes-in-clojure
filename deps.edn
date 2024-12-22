@@ -3,7 +3,7 @@
         io.github.borkdude/deflet {:mvn/version "0.1.0"}
         methodical/methodical {:mvn/version "1.0.124"}
         org.clojure/clojure {:mvn/version "1.12.0"}
-        org.babashka/cli {:mvn/version "0.8.60"}
+        org.babashka/cli {:mvn/version "0.8.62"}
         tesser.core/tesser.core {:mvn/version "1.0.6"}}
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :patches {:extra-paths ["patches"]
