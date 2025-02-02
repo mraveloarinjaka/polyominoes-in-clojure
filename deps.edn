@@ -7,7 +7,7 @@
         tesser.core/tesser.core {:mvn/version "1.0.6"}}
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :patches {:extra-paths ["patches"]
-                     :extra-deps {com.cnuernber/ham-fisted {:mvn/version "2.019"}}}
+                     :extra-deps {com.cnuernber/ham-fisted {:mvn/version "2.020"}}}
            :exec {:main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
