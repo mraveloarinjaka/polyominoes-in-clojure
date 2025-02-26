@@ -14,7 +14,7 @@
                               ;"-Djdk.attach.allowAttachSelf"
                               ]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.131"}
-                                org.slf4j/slf4j-simple {:mvn/version "2.0.16"}
+                                org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
                                 uncomplicate/neanderthal {:mvn/version "0.52.0"}}}
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner
