@@ -2,7 +2,7 @@
  :deps {com.taoensso/timbre {:mvn/version "6.7.1"}
         io.github.borkdude/deflet {:mvn/version "0.1.0"}
         methodical/methodical {:mvn/version "1.0.127"}
-        org.clojure/clojure {:mvn/version "1.12.0"}
+        org.clojure/clojure {:mvn/version "1.12.1"}
         org.babashka/cli {:mvn/version "0.8.62"}
         tesser.core/tesser.core {:mvn/version "1.0.7"}}
  :aliases {:dev {:extra-paths ["dev" "test"]}
