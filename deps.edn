@@ -13,7 +13,7 @@
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
                               ;"-Djdk.attach.allowAttachSelf"
                               ]
-                   :extra-deps {cnuernber/dtype-next {:mvn/version "10.142"}
+                   :extra-deps {cnuernber/dtype-next {:mvn/version "10.143"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
                                 uncomplicate/neanderthal {:mvn/version "0.52.0"}}}
            :test {:exec-fn cognitect.test-runner.api/test
