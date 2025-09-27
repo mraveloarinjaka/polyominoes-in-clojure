@@ -13,3 +13,4 @@ pom.xml.asc
 *.class
 *.jar
 .rebel_readline_history
+/opencode.jsonc

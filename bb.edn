@@ -1,0 +1,12 @@
+{:paths ["scripts"]
+ :tasks {:requires ([babashka.fs :as fs]
+                    [clojure.string :as str]
+                    [tasks])
+         -opencode-config (tasks/generate-opencode-configuration)
+         opencode {:depends [-opencode-config]
+                   ;:task (shell {:extra-env {(if (fs/windows?) "Path" "PATH")
+                   ;                    (str "on-path" fs/path-separator (System/getenv "PATH"))}}
+                   ;             "opencode")
+                   :task (shell "opencode")}
+         run-tests (shell "clojure -M:test:dev")}}
+

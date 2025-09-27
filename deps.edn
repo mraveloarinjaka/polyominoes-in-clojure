@@ -19,4 +19,10 @@
                                {:git/sha "3f288f1f16d167723ad87cc35b1dfee3c1681e10"}}
                   :extra-paths ["test"]
                   :jvm-opts ["-Dtaoensso.timbre.config.edn={:min-level :info}"]
-                  :main-opts ["-m" "cognitect.test-runner"]}}}
+                  :main-opts ["-m" "cognitect.test-runner"]}
+           :clojure-mcp {:deps {org.slf4j/slf4j-nop {:mvn/version "2.0.17"} ;; Required for stdio server
+                                com.bhauman/clojure-mcp {:git/url "https://github.com/bhauman/clojure-mcp.git"
+                                                         :git/tag "v0.1.7-alpha"
+                                                         :git/sha "992fe5d"}}
+                         :exec-fn clojure-mcp.main/start-mcp-server
+                         :exec-args {:port 7888}}}}
