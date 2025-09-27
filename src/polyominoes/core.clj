@@ -20,24 +20,20 @@
      (fn [[x y]] [(- x originX) (- y originY)])
      polyomino)))
 
-(defn- rotateOnePoint90
-  [[x y]]
-  [(* y -1) x])
+(defn- rotate-point
+  "Rotate a single point by k*90 degrees CCW."
+  [k [x y]]
+  (case (mod k 4)
+    0 [x y]
+    1 [(- y) x]
+    2 [(- x) (- y)]
+    3 [y (- x)]))
 
-(defn- rotateOnePoint180
-  [[x y]]
-  [(* x -1) (* y -1)])
-
-(defn- rotateOnePoint270
-  [[x y]]
-  [y (* x -1)])
-
-(defn- rotate
-  ([rotation polyomino]
-   (mapv rotation polyomino))
-  ([rotation]
-   (fn [polyomino]
-     (rotate rotation polyomino))))
+(defn- rotate-by-k
+  "Return a function that rotates a polyomino by k*90 degrees CCW."
+  [k]
+  (fn [polyomino]
+    (mapv (partial rotate-point k) polyomino)))
 
 (defn- mirror
   [polyomino]
@@ -47,16 +43,10 @@
 
 (defn- retrieveRotationsAndMirror
   [polyomino]
-  ((juxt
-    identity
-    (rotate rotateOnePoint90)
-    (rotate rotateOnePoint180)
-    (rotate rotateOnePoint270)
-    mirror
-    (comp (rotate rotateOnePoint90) mirror)
-    (comp (rotate rotateOnePoint180) mirror)
-    (comp (rotate rotateOnePoint270) mirror))
-   polyomino))
+  {:pre [(seq polyomino)]}
+  (let [rots (mapv (fn [k] ((rotate-by-k k) polyomino)) (range 4))
+        mirrors (mapv mirror rots)]
+    (into [] (concat rots mirrors))))
 
 (defn- retrieveCanonicalForm
   [polyomino]
