@@ -13,7 +13,7 @@
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.146"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
-                                uncomplicate/neanderthal {:mvn/version "0.55.0"}}}
+                                uncomplicate/neanderthal {:mvn/version "0.58.0"}}}
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/sha "3f288f1f16d167723ad87cc35b1dfee3c1681e10"}}
