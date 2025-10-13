@@ -100,19 +100,20 @@
   args)
 
 (defn- generate
-  ([args]
-   (let [initial-result [[[0 0]]]]
-     (lazy-seq (cons initial-result (generate args initial-result)))))
-  ([args polyominoes]
-   (let [args (update args :nb-calls (fnil inc 0))
-         input (assoc args
-                      ::gen/neighbors neighbors
-                      ::gen/retrieve-canonical-form retrieveCanonicalForm
-                      ::gen/generate-from-one fromOnePolyomino
-                      ::gen/generate-from-one-xf fromOnePolyominoTransducer)
-         ;generated (m/trace gen/generate input)
-         generated (gen/generate polyominoes input)]
-     (lazy-seq (cons generated (generate args generated))))))
+  [args]
+  (let [base-input (assoc args
+                          ::gen/neighbors neighbors
+                          ::gen/retrieve-canonical-form retrieveCanonicalForm
+                          ::gen/generate-from-one fromOnePolyomino
+                          ::gen/generate-from-one-xf fromOnePolyominoTransducer)
+        step-fn (fn [{:keys [polyominoes nb-calls]}]
+                  (let [input (assoc base-input :nb-calls nb-calls)
+                        next-gen (gen/generate polyominoes input)]
+                    {:polyominoes next-gen
+                     :nb-calls (inc nb-calls)}))]
+    (->> {:polyominoes [[[0 0]]] :nb-calls 0}
+         (iterate step-fn)
+         (map :polyominoes))))
 
 (defn nbOfPolyominoes
   {:org.babashka/cli {:coerce {:cells :long
