@@ -5,7 +5,9 @@
         org.clojure/clojure {:mvn/version "1.12.6"}
         org.babashka/cli {:mvn/version "0.8.66"}
         tesser.core/tesser.core {:mvn/version "1.0.9"}}
- :aliases {:dev {:extra-paths ["dev" "test"]}
+ :aliases {:dev {:extra-paths ["dev" "test"]
+                 :extra-deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.5.1"}}
+                 :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
            :patches {:extra-paths ["patches"]
                      :extra-deps {com.cnuernber/ham-fisted {:mvn/version "2.039"}}}
            :exec {:main-opts ["-m" "babashka.cli.exec"]}

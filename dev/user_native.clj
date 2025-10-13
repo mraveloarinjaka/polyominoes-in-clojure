@@ -36,3 +36,16 @@
 
   (comment))
 
+(comment
+
+  (require '[clj-async-profiler.core :as prof])
+  (require '[polyominoes.core-native :as cnative])
+
+  (prof/profile (cnative/count-n 5))
+
+  ;; The resulting flamegraph will be stored in /tmp/clj-async-profiler/results/
+  ;; You can view the HTML file directly from there or start a local web UI:
+
+  (prof/serve-ui "100.102.204.99" 8080) ; Serve on port 8080
+
+  (comment))
