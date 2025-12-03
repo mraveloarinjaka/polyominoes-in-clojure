@@ -4,7 +4,7 @@
         methodical/methodical {:mvn/version "1.0.127"}
         org.clojure/clojure {:mvn/version "1.12.3"}
         org.babashka/cli {:mvn/version "0.8.66"}
-        tesser.core/tesser.core {:mvn/version "1.0.7"}}
+        tesser.core/tesser.core {:mvn/version "1.0.8"}}
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :patches {:extra-paths ["patches"]
                      :extra-deps {com.cnuernber/ham-fisted {:mvn/version "2.039"}}}
