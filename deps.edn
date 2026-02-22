@@ -13,7 +13,7 @@
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
                    :extra-deps {cnuernber/dtype-next {:mvn/version "10.146"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
-                                uncomplicate/neanderthal {:mvn/version "0.55.0"}}}
+                                uncomplicate/neanderthal {:mvn/version "0.61.0"}}}
            :mkl {:extra-deps {org.bytedeco/mkl {:mvn/version "2025.3-1.5.13"}
                               org.bytedeco/javacpp {:mvn/version "1.5.13"}}}
            :test
