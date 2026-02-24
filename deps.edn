@@ -11,7 +11,7 @@
            :exec {:main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
-                   :extra-deps {cnuernber/dtype-next {:mvn/version "10.146"}
+                   :extra-deps {cnuernber/dtype-next {:mvn/version "11.007"}
                                 org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
                                 uncomplicate/neanderthal {:mvn/version "0.55.0"}}}
            :mkl {:extra-deps {org.bytedeco/mkl {:mvn/version "2025.3-1.5.13"}
