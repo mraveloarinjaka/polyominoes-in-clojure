@@ -26,12 +26,6 @@
 - Scripts: `bb.edn`, `scripts/tasks.clj`
 - CI: `.github/workflows/clj-watson.yml`
 
-## Workflow (Agents)
-- Plan First: Summarize intent, assumptions, minimal scope before editing.
-- Recon: Read `deps.edn`, target namespaces, and relevant tests first.
-- Small Diffs: Prefer surgical edits; avoid broad refactors without approval.
-- Safety: Don’t change git config, push, or commit unless asked.
-
 ## Editing Rules
 - Structural Edits: Keep forms balanced; prefer Clojure-aware, top-level form ops.
 - Minimal Scope: Touch only relevant files/defs; preserve naming and style.
@@ -50,26 +44,6 @@
 - Logging: Use `timbre` sparingly; no debug prints in commits.
 - Performance: In generators, avoid unnecessary realization; prefer `reduce`/transducers in hot paths.
 
-## Commit & PRs
-- Default: Do not commit unless explicitly requested.
-- Message Style: Clear “why” over “what”; short and specific.
-- Scope: Stage only relevant files; review diffs before committing.
-- PRs: State motivation and impact; include minimal usage/repro notes if behavior changes.
-
-## Security & Compliance
-- Dependencies: CI runs `clj-watson`; avoid unnecessary version changes.
-- Secrets: Never commit credentials/tokens; scrub debug artifacts.
-- Network: Avoid external network access unless required and approved.
-
 ## Local Tooling
 - Babashka: `bb run-tests`, `bb opencode` (generates `opencode.jsonc` from `opencode.edn`/`.nrepl-port`).
 - Dev REPL: `clojure -M:dev` to include `dev` and `test` on classpath.
-
-## Acceptance Checklist (per change)
-- Understood: Inputs, outputs, constraints verified.
-- Minimal Diff: Single, coherent change; no drive-by edits.
-- Tests: New/changed behavior covered; `clojure -M:test` green.
-- Docs: Public behavior changes documented.
-- Clean: No debug prints; no secrets; logs minimal.
-
-If you want, I can commit and open a PR for this file; tell me to proceed.
