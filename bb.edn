@@ -8,5 +8,7 @@
                    ;                    (str "on-path" fs/path-separator (System/getenv "PATH"))}}
                    ;             "opencode")
                    :task (shell "opencode")}
+         ;start-repl (shell "clojure -M:dev:maths:repl/nrepl")
+         start-repl (shell "clojure -M:dev:repl/nrepl")
          run-tests (shell "clojure -M:test:dev")}}
 
