@@ -11,7 +11,10 @@ Environment
 Source & tests
 - Source path: `src`
 - Test path: `test`
+- Native (MKL) test path: `test-native`
 - Run all tests: `clj -M:test`
+- Run native tests: `clj -M:test:maths:test-native`
+- Native sanity check (one-shot: counts, agreement, timings, MKL leak check): `clj -M:dev:maths -i dev/native_check.clj`
 - Quick single-namespace test: `clj -M:dev -e "(require 'clojure.test) (require 'polyominoes.core-test) (clojure.test/run-tests 'polyominoes.core-test)"`
 
 Key namespaces & files
@@ -32,6 +35,8 @@ Dependencies (high-level)
 Aliases
 - `:dev` includes `dev` and `test` on the classpath
 - `:test` configured to run `cognitect.test-runner` for CI
+- `:maths` adds neanderthal/MKL and the JVM exports it requires
+- `:test-native` runs the core-native suite (`-d test-native`); combine with `:test` and `:maths`
 
 Notes
 - Generator code is split into reducer/transducer/tesser implementations under `src/polyominoes/generator/`.

@@ -30,6 +30,12 @@
             :extra-paths ["test"]
             :jvm-opts ["-Dtaoensso.timbre.config.edn={:min-level :info}"]
             :main-opts ["-m" "cognitect.test-runner"]}
+           ;; Combine with :test (runner dep) and :maths (neanderthal/MKL):
+           ;; clojure -M:test:maths:test-native. :main-opts is last-wins, so
+           ;; :test-native must come after :test on the command line.
+           :test-native
+           {:extra-paths ["test-native"]
+            :main-opts ["-m" "cognitect.test-runner" "-d" "test-native"]}
            :clojure-mcp
            {:deps {org.slf4j/slf4j-nop {:mvn/version "2.0.20"} ;; Required for stdio server
                    com.bhauman/clojure-mcp {:git/url "https://github.com/bhauman/clojure-mcp.git"

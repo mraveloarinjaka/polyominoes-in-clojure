@@ -15,13 +15,15 @@
 ## Common Commands
 - Run all tests: `clojure -M:test`
 - Run tests with dev CP: `clojure -M:test:dev`
+- Run native (MKL) tests: `clojure -M:test:maths:test-native` (or `bb run-tests-native`)
+- Native sanity check, one-shot JVM: `clojure -M:dev:maths -i dev/native_check.clj`
 - Quick single ns: `clojure -M:dev -e "(require 'clojure.test 'polyominoes.core-test) (clojure.test/run-tests 'polyominoes.core-test)'"
-- Babashka tasks: `bb run-tests`, `bb opencode`
+- Babashka tasks: `bb run-tests`, `bb run-tests-native`, `bb opencode`
 - Launch MCP server: `clojure -X:clojure-mcp :port 7888`
 
 ## Repository Layout
 - Library: `src/polyominoes/*.clj`, `src/polyominoes/generator/*.clj`
-- Tests: `test/polyominoes/*_test.clj`
+- Tests: `test/polyominoes/*_test.clj`, `test-native/polyominoes/*_test.clj` (native suite, needs `:maths`)
 - Docs: `doc/intro.md`, `PROJECT_SUMMARY.MD`, `README.md`
 - Scripts: `bb.edn`, `scripts/tasks.clj`
 - CI: `.github/workflows/clj-watson.yml`

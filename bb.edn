@@ -10,5 +10,6 @@
                    :task (shell "opencode")}
          ;start-repl (shell "clojure -M:dev:maths:repl/nrepl")
          start-repl (shell "clojure -M:dev:repl/nrepl")
-         run-tests (shell "clojure -M:test:dev")}}
+         run-tests (shell "clojure -M:test:dev")
+         run-tests-native (shell "clojure -M:test:maths:test-native")}}
 
