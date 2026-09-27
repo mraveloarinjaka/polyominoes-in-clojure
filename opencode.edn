@@ -1,4 +1,4 @@
 {:$schema "https://opencode.ai/config.json"
  :mcp {:clojure-mcp {:type "local"
                      :enabled true
-                     :command ["clojure" "-X:clojure-mcp" ":port"]}}}
+                     :command ["clojure" "-T:clojure-mcp" ":port"]}}}
