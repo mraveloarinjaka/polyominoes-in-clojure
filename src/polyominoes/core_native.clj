@@ -33,9 +33,13 @@
     polyomino))
 
 (defn mirror!
+  "Mirrors `polyomino` in place (negates its x row), returning it.
+
+  Same dihedral reflection set as the previous out-of-place version
+  (negating y instead of x): `->all-forms` still covers all 8 symmetries."
   [polyomino]
-  (let [m (native/dge 2 2 [1 0 0 -1])]
-    (ucore/mm m polyomino)))
+  (ucore/scal! -1 (ucore/row polyomino 0))
+  polyomino)
 
 (defn apply-xf
   ([xf mirror?]
