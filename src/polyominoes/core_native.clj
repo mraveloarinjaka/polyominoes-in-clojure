@@ -50,10 +50,23 @@
   ([xf]
    (apply-xf xf false)))
 
+(defn- release-all
+  "Releases every native object in `xs`.
+
+  Collections are not `Releaseable` under the neanderthal semantics
+  (`release`/`with-release` on a vector or lazy seq is a no-op), so releasing
+  a batch of matrices must be done explicitly, element by element."
+  [xs]
+  (run! release xs)
+  xs)
+
 (defn ->all-forms
+  "Returns the 7 derived symmetry forms of `polyomino` (3 rotations, the
+  mirror and 3 mirrored rotations), each a fresh native matrix the caller
+  must release. The identity form is excluded: the caller compares the
+  `polyomino` itself against these copies."
   [polyomino]
-  (let [all-xfs (juxt identity
-                      (apply-xf rotate90!)
+  (let [all-xfs (juxt (apply-xf rotate90!)
                       (apply-xf rotate180!)
                       (apply-xf rotate270!)
                       (comp mirror! ucore/copy)
@@ -140,13 +153,19 @@
 
 (defn ->canonical-form!
   [polyomino]
-  (with-release [all-forms (->all-forms polyomino)]
-    (let [canonical-form (->> all-forms
-                              (mapv ->canonical-repr!)
-                              index-by-cols-hash-key
-                              first
-                              val)]
-      (ucore/copy! canonical-form polyomino))))
+  (let [derived-forms (->all-forms polyomino)
+        canonical-form (->> (into [polyomino] derived-forms)
+                            (mapv ->canonical-repr!)
+                            index-by-cols-hash-key
+                            first
+                            val)]
+    ;; The original form stays in the comparison above: dropping it would make
+    ;; canonicalisation depend on the input orientation (a polyomino that is
+    ;; already canonical would map to its second-smallest form, while any
+    ;; rotated copy of it would still map to the true minimum).
+    (ucore/copy! canonical-form polyomino)
+    (release-all derived-forms)
+    polyomino))
 
 #_(with-release [polyomino (native/dge R2 3 [1 1 1 2 0 1])]
     (->canonical-form! polyomino)
@@ -158,6 +177,8 @@
 (def TRANSLATIONS-TO-NEIGHBORS (native/dge NB-ROWS-PER-NEIGHBOR NB-NEIGHBORS [0 1 -1 0 0 -1 1 0]))
 
 (defn ->one-point-neighbors
+  "Returns the 4 neighbours of point `xy` as a fresh native matrix the
+  caller must release."
   [xy]
   (let [xy4 (native/dge NB-ROWS-PER-NEIGHBOR NB-NEIGHBORS (cycle xy))]
     (ucore/axpy! TRANSLATIONS-TO-NEIGHBORS xy4)))
@@ -176,14 +197,14 @@
   (let [N (ucore/ncols polyomino)
         neighbors (native/dge (* NB-NEIGHBORS NB-ROWS-PER-NEIGHBOR N) (inc N))]
     (doseq [i (range N)
-            :let [ith-xy (ucore/col polyomino i)
-                  ith-xy-neighbors (->one-point-neighbors ith-xy)]
-            k (range NB-NEIGHBORS)
-            :let [neighbor (->ith-point-kth-neighbor neighbors i k (inc N))
-                  neighbor-last-column (ucore/col neighbor N)]]
-      (ucore/copy! polyomino (ucore/submatrix neighbor R2 N))
-      (ucore/copy! (ucore/col ith-xy-neighbors k) neighbor-last-column)
-      (->canonical-form! neighbor))
+            :let [ith-xy (ucore/col polyomino i)]]
+      (with-release [ith-xy-neighbors (->one-point-neighbors ith-xy)]
+        (doseq [k (range NB-NEIGHBORS)
+                :let [neighbor (->ith-point-kth-neighbor neighbors i k (inc N))
+                      neighbor-last-column (ucore/col neighbor N)]]
+          (ucore/copy! polyomino (ucore/submatrix neighbor R2 N))
+          (ucore/copy! (ucore/col ith-xy-neighbors k) neighbor-last-column)
+          (->canonical-form! neighbor))))
     neighbors))
 
 #_(with-release [origin (native/dge R2 1 [0 0])]
@@ -197,8 +218,7 @@
 
 (defn valid?
   [polyomino]
-  (let [invalid-point (native/dv -2 -2)]
-    (nil? (:duplicate (reduce has-duplicate? invalid-point (ucore/cols polyomino))))))
+  (nil? (:duplicate (reduce has-duplicate? nil (ucore/cols polyomino)))))
 
 (defn ->valid-neighbors
   [neighbors]
@@ -227,11 +247,14 @@
 
 (defn from-polyominoes
   [polyominoes]
-  (with-release [generated (->> polyominoes
-                                (pmap from-one-polyomino)
-                                (filter seq)
-                                (apply concat))]
-    (mapv ucore/copy (vals (index-by-cols-hash-key generated)))))
+  (let [generated (->> polyominoes
+                       (pmap from-one-polyomino)
+                       (filter seq)
+                       (apply concat)
+                       vec)
+        next-polyominoes (mapv ucore/copy (vals (index-by-cols-hash-key generated)))]
+    (release-all generated)
+    next-polyominoes))
 
 (defn generate
   ([]
@@ -247,10 +270,10 @@
   (loop [n 1 polyominoes (vector (native/dge R2 1 [0 0]))]
     (if (< n N)
       (let [next-polyominoes (from-polyominoes polyominoes)]
-        (release polyominoes)
+        (release-all polyominoes)
         (recur (inc n) next-polyominoes))
       (let [result (count polyominoes)]
-        (release polyominoes)
+        (release-all polyominoes)
         result))))
 
 (defn -main
