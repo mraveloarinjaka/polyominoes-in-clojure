@@ -6,7 +6,6 @@
             [uncomplicate.commons.core :refer [release with-release] :as ccore]
             [uncomplicate.neanderthal
              [core :as ucore]
-             [math :as math]
              [native :as native]
              [auxil :as auxil]]))
 
@@ -119,28 +118,30 @@
     (->canonical-repr! polyomino)
     (print polyomino))
 
-(defn lexicographic-compare
-  [p1 p2]
-  (let [N (ucore/ncols p1)]
-    (with-release [v1 (->cols-hash-base-N p1)
-                   v2 (->cols-hash-base-N p2)]
-      (loop [i 0]
-        (if (< i N)
-          (let [x1 (ucore/entry v1 i)
-                x2 (ucore/entry v2 i)]
-            (cond
-              (math/f< x1 x2) -1
-              (math/f< x2 x1) 1
-              :else (recur (inc i))))
-          0)))))
+(defn ->cols-hash-key
+  "Returns the base-N column hashes of `polyomino` as a vector of longs.
+
+  Computed once per polyomino, the key lives on the JVM heap so ordering and
+  deduplication compare plain vectors instead of going back to native memory.
+  Two canonical polyominoes are equal iff their keys are equal."
+  [polyomino]
+  (with-release [hash-base-N (->cols-hash-base-N polyomino)]
+    (into [] (map long) hash-base-N)))
+
+(defn index-by-cols-hash-key
+  "Indexes `polyominoes` by `->cols-hash-key` into a sorted map: duplicates
+  collapse onto a single entry and `vals` come out in lexicographic order."
+  [polyominoes]
+  (into (sorted-map) (map (juxt ->cols-hash-key identity)) polyominoes))
 
 (defn ->canonical-form!
   [polyomino]
   (with-release [all-forms (->all-forms polyomino)]
     (let [canonical-form (->> all-forms
                               (mapv ->canonical-repr!)
-                              (apply sorted-set-by lexicographic-compare)
-                              first)]
+                              index-by-cols-hash-key
+                              first
+                              val)]
       (ucore/copy! canonical-form polyomino))))
 
 #_(with-release [polyomino (native/dge R2 3 [1 1 1 2 0 1])]
@@ -217,7 +218,8 @@
 
 #_(with-release [origin (native/dge R2 1 [1 1])]
     (->> (from-one-polyomino origin)
-         (apply sorted-set-by lexicographic-compare)))
+         index-by-cols-hash-key
+         keys))
 
 (defn from-polyominoes
   [polyominoes]
@@ -225,7 +227,7 @@
                                 (pmap from-one-polyomino)
                                 (filter seq)
                                 (apply concat))]
-    (mapv ucore/copy (apply sorted-set-by lexicographic-compare generated))))
+    (mapv ucore/copy (vals (index-by-cols-hash-key generated)))))
 
 (defn generate
   ([]
