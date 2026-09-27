@@ -183,62 +183,80 @@
   (let [xy4 (native/dge NB-ROWS-PER-NEIGHBOR NB-NEIGHBORS (cycle xy))]
     (ucore/axpy! TRANSLATIONS-TO-NEIGHBORS xy4)))
 
-(defn ith-point-kth-neighbor-starting-line
-  [ith kth]
-  (let [number-of-rows-for-neighbors (* NB-NEIGHBORS NB-ROWS-PER-NEIGHBOR)]
-    (+ (* ith number-of-rows-for-neighbors) (* NB-ROWS-PER-NEIGHBOR kth))))
+(defn- ->existing-cells
+  "JVM-side set of `polyomino`'s cell coordinates as [x y] pairs of longs."
+  [polyomino]
+  (into #{} (map (fn [col] [(long (ucore/entry col 0)) (long (ucore/entry col 1))]))
+        (ucore/cols polyomino)))
 
-(defn ->ith-point-kth-neighbor
-  [neighbors ith kth mcols]
-  (ucore/submatrix neighbors (ith-point-kth-neighbor-starting-line ith kth) 0 2 mcols))
+(defn- ->nth-neighbor
+  "Row-block `n` of the `neighbors` arena: a R2 x `mcols` view."
+  [neighbors n mcols]
+  (ucore/submatrix neighbors (* n NB-ROWS-PER-NEIGHBOR) 0 R2 mcols))
+
+(defn- ->point-neighbors!
+  "Writes the valid neighbours of point `i` of `polyomino` into consecutive
+  row-blocks of the `neighbors` arena, starting at block `nb`, canonicalising
+  each one as it is written, and returns the updated block count.
+
+  A candidate is valid iff its new cell is not already a cell of `polyomino`
+  (checked JVM-side against `existing-cells`); invalid candidates are neither
+  written nor canonicalised."
+  [polyomino neighbors existing-cells i nb]
+  (let [mcols (ucore/ncols neighbors)
+        N (ucore/ncols polyomino)]
+    (with-release [ith-xy-neighbors (->one-point-neighbors (ucore/col polyomino i))]
+      (reduce
+       (fn [nb k]
+         (let [candidate (ucore/col ith-xy-neighbors k)
+               cell [(long (ucore/entry candidate 0)) (long (ucore/entry candidate 1))]]
+           (if (contains? existing-cells cell)
+             nb
+             (let [neighbor (->nth-neighbor neighbors nb mcols)]
+               (ucore/copy! polyomino (ucore/submatrix neighbor 0 0 R2 N))
+               (ucore/copy! candidate (ucore/col neighbor N))
+               (->canonical-form! neighbor)
+               (inc nb)))))
+       nb
+       (range NB-NEIGHBORS)))))
 
 (defn ->neighbors
+  "Returns `[neighbors nb-neighbors]`: the arena matrix holding the
+  canonicalised valid neighbours of `polyomino` packed into its first
+  `nb-neighbors` row-blocks, and their count. Candidates whose new cell
+  duplicates an existing cell of `polyomino` are skipped before any write
+  or canonicalisation, so every packed neighbour is valid by construction.
+  The caller owns and must release the arena."
   [polyomino]
   (let [N (ucore/ncols polyomino)
-        neighbors (native/dge (* NB-NEIGHBORS NB-ROWS-PER-NEIGHBOR N) (inc N))]
-    (doseq [i (range N)
-            :let [ith-xy (ucore/col polyomino i)]]
-      (with-release [ith-xy-neighbors (->one-point-neighbors ith-xy)]
-        (doseq [k (range NB-NEIGHBORS)
-                :let [neighbor (->ith-point-kth-neighbor neighbors i k (inc N))
-                      neighbor-last-column (ucore/col neighbor N)]]
-          (ucore/copy! polyomino (ucore/submatrix neighbor R2 N))
-          (ucore/copy! (ucore/col ith-xy-neighbors k) neighbor-last-column)
-          (->canonical-form! neighbor))))
-    neighbors))
+        neighbors (native/dge (* NB-NEIGHBORS NB-ROWS-PER-NEIGHBOR N) (inc N))
+        existing-cells (->existing-cells polyomino)]
+    [neighbors (reduce (fn [nb i] (->point-neighbors! polyomino neighbors existing-cells i nb))
+                        0
+                        (range N))]))
 
 #_(with-release [origin (native/dge R2 1 [0 0])]
     (->neighbors origin))
 
-(defn has-duplicate?
-  [previous-point current-point]
-  (if (= previous-point current-point)
-    (reduced {:duplicate current-point})
-    current-point))
-
-(defn valid?
-  [polyomino]
-  (nil? (:duplicate (reduce has-duplicate? nil (ucore/cols polyomino)))))
-
 (defn ->valid-neighbors
-  [neighbors]
-  (let [M (ucore/mrows neighbors)
-        nb-neighbors (/ M NB-ROWS-PER-NEIGHBOR)
-        N (ucore/ncols neighbors)]
-    (for [neighbor-idx (range nb-neighbors)
-          :let [neighbor (ucore/submatrix neighbors (* neighbor-idx NB-ROWS-PER-NEIGHBOR) 0 R2 N)]
-          :when (valid? neighbor)]
-      neighbor)))
+  "Eager vector of neighbour views into the `[neighbors nb-neighbors]` pair
+  returned by `->neighbors`. Every packed neighbour is valid by construction;
+  the views die with the arena, so copy them out (e.g. with `ucore/copy`) to
+  keep them."
+  [[neighbors nb-neighbors]]
+  (into [] (map (fn [n] (->nth-neighbor neighbors n (ucore/ncols neighbors))))
+        (range nb-neighbors)))
 
 #_(with-release [origin (native/dge R2 1 [1 1])]
     (->valid-neighbors (->neighbors origin)))
 
 (defn from-one-polyomino
   [polyomino]
-  (with-release [neighbors (->neighbors polyomino)]
-    (when-let [valid-neighbors (seq (->valid-neighbors neighbors))]
-      (log/trace :valid-neighbors (count valid-neighbors))
-      (mapv ucore/copy valid-neighbors))))
+  (let [[neighbors nb-neighbors] (->neighbors polyomino)]
+    (with-release [arena neighbors]
+      (when-let [valid-neighbors (seq (->valid-neighbors [arena nb-neighbors]))]
+        (log/trace :valid-neighbors (count valid-neighbors))
+        (mapv ucore/copy valid-neighbors)))))
 
 #_(with-release [origin (native/dge R2 1 [1 1])]
     (->> (from-one-polyomino origin)
