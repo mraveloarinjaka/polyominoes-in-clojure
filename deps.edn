@@ -9,7 +9,7 @@
                  :extra-deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.8.0"}}
                  :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
            :patches {:extra-paths ["patches"]
-                     :extra-deps {com.cnuernber/ham-fisted {:mvn/version "3.035"}}}
+                     :extra-deps {com.cnuernber/ham-fisted {:mvn/version "3.037"}}}
            :exec {:main-opts ["-m" "babashka.cli.exec"]}
            :maths {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                               "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"]
